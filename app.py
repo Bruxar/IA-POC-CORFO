@@ -1,6 +1,12 @@
 import streamlit as st
 from llm_chains import load_normal_chain
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from utils import save_chat_history_json
+import yaml
+import os
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 def load_chain(chat_history):
     return load_normal_chain(chat_history)
@@ -13,13 +19,21 @@ def set_send_input():
     st.session_state.send_input = True
     clear_input_field()
 
+def save_chat_history():
+    if st.session_state.history != []:
+        save_chat_history_json(st.session_state.history, config["chat_history_path"] + "random" + ".json")
+
 def main():
     st.title("IA LOCAL CORFO")
     chat_container = st.container()
+    st.sidebar.title("Sesiones de Chat")
+    chat_sessions = ["new_session"] + os.listdir(config["chat_history_path"])
 
     if "send_input" not in st.session_state:
         st.session_state.send_input = False
         st.session_state.user_question = ""
+    
+    st.sidebar.selectbox("Seleccionar sesion de chat", chat_sessions, key="session_key")
 
     chat_history = StreamlitChatMessageHistory(key="history")
     llm_chain = load_chain(chat_history)
@@ -34,13 +48,15 @@ def main():
             with chat_container:
                 st.chat_message("user").write(st.session_state.user_question)
                 llm_response = llm_chain.run(st.session_state.user_question)
-                st.chat_message("ai").write(llm_response)
                 st.session_state.user_question = ""
 
     if chat_history.messages != []:
-        st.write("Historial de mensajes:")
-        for message in chat_history.messages:
-            st.chat_message(message.type).write(message.content)
+        with chat_container:
+            st.write("Historial de mensajes:")
+            for message in chat_history.messages:
+                st.chat_message(message.type).write(message.content)
+    
+    save_chat_history()
     
 if __name__ == "__main__":
     main()
