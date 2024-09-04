@@ -1,0 +1,21 @@
+#Ignorar entornor virtuales
+chat_venv/
+.chat_venv/
+
+#Ignorar archivos de caché de Python
+__pycache_/
+
+#Ignorar modelos de LLM
+models/
+.models/
+
+#Ignorar archivos de datos grandes
+*.gguf
+
+# Ignorar archivos de Streamlit generados
+.streamlit/secrets.toml
+streamlit.db
+
+# Ignorar archivos del sistema
+.DS_Store
+Thumbs.db
