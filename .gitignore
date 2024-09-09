@@ -19,3 +19,5 @@ streamlit.db
 # Ignorar archivos del sistema
 .DS_Store
 Thumbs.db
+
+chat_sessions/*
